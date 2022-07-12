@@ -1,0 +1,62 @@
+[
+    {
+        "hat": "blue",
+        "stash": "orange",
+        "back": "blue",
+        "tokenId": 0
+    },
+    {
+        "hat": "red",
+        "stash": "blue",
+        "back": "blue",
+        "tokenId": 1
+    },
+    {
+        "hat": "red",
+        "stash": "red",
+        "back": "blue",
+        "tokenId": 2
+    },
+    {
+        "hat": "red",
+        "stash": "orange",
+        "back": "blue",
+        "tokenId": 3
+    },
+    {
+        "hat": "blue",
+        "stash": "orange",
+        "back": "red",
+        "tokenId": 4
+    },
+    {
+        "hat": "blue",
+        "stash": "blue",
+        "back": "blue",
+        "tokenId": 5
+    },
+    {
+        "hat": "blue",
+        "stash": "red",
+        "back": "red",
+        "tokenId": 6
+    },
+    {
+        "hat": "red",
+        "stash": "orange",
+        "back": "red",
+        "tokenId": 7
+    },
+    {
+        "hat": "red",
+        "stash": "black",
+        "back": "red",
+        "tokenId": 8
+    },
+    {
+        "hat": "red",
+        "stash": "red",
+        "back": "black",
+        "tokenId": 9
+    }
+]

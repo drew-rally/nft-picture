@@ -1,0 +1,1 @@
+{"traits": {"hat": ["black", "blue", "red", 0], "stash": ["black", "blue", "red", "orange"], "back": ["black", "blue", "red", 0]}, "probs": {"hat-prob": [11.0, 33.0, 55.0, 0.0], "stash-prob": [10, 30, 50, 90], "back-prob": [1.0, 3.0, 5.0, 0.0]}}

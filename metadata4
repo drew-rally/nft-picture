@@ -1,0 +1,19 @@
+{
+    "image": "ADD_IMAGES_BASE_URI_HERE4.png",
+    "tokenId": 4,
+    "name": "ADD_PROJECT_NAME_HERE 4",
+    "attributes": [
+        {
+            "trait_type": "back",
+            "value": "red"
+        },
+        {
+            "trait_type": "hat",
+            "value": "blue"
+        },
+        {
+            "trait_type": "stash",
+            "value": "orange"
+        }
+    ]
+}

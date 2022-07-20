@@ -6,8 +6,9 @@ import json
 import csv
 import pandas as pd
 import os
-
 #update
+
+
 def json_csv(csvFilePath):
     df = pd.read_csv(csvFilePath).fillna(0)
     # read in and count columns
@@ -44,7 +45,7 @@ def json_csv(csvFilePath):
     traits_file.close()
 
 
-json_csv("/Users/drewlevine/PycharmProjects/layering/csv/RLY.csv")
+json_csv("/Users/drewlevine/PycharmProjects/layering/csv/testrly.csv")
 
 
 
@@ -57,28 +58,14 @@ num_of_traits = (len(data['traits']))
 traits = data['traits']
 probabilities = data['probs']
 
-
-
-
-
-hat = ["black", "blue", "red"]
-hair_weights = [30, 40, 15]
-
-stash = ["black", "blue", "red", "orange"]
-glasses_weights = [30, 40, 15, 0]
-
-back = ["black", "blue", "red"]
-stash_weights = [30, 40, 15, ]
+print(traits)
 
 # Dictionary variable for each trait.
 # Eech trait corresponds to its file name
 
-hat_files = {
-    "black": "black-hair",
-    "red": "red-hair",
-    "blue": "blue-hair",
-}
+"""hat_files = os.listdir('/Users/drewlevine/PycharmProjects/layering/shit NFTs/hat')
 
+print(hat_files)
 back_files = {
     "black": "black-back",
     "red": "red-back",
@@ -94,7 +81,7 @@ stash_files = {
 }
 
 
-
+"""
 
 TOTAL_IMAGES = 10  # Number of random unique images we want to generate
 
@@ -104,19 +91,29 @@ all_images = []
 # A recursive function to generate unique image combinations
 
 # base_trait is the triat being checked and required_trait is the trait needed
-def conditional_trait(characters, required_characters):
+def conditional_trait(characters, required_characters, trait_prob, spotInList):
     if characters == required_characters:
-        glasses_weights[3] = 40
+        probabilities[trait_prob][spotInList] = 40
 
     else:
-        glasses_weights[3] = 0
+        probabilities[trait_prob][spotInList] = 0
+
+    print(probabilities)
 
 
+
+# to:do add conditional_trait optionality
 def create_new_image():
     new_image = {}
 
     # For each trait category, select a random trait based on the weightings
     for trait in (data['traits']):
+        #how do I check the most recently added trait
+        try:
+            # checks if the hat trait is red in
+            conditional_trait(new_image['hat'], 'red',"stash-prob", 3)
+        except:
+            pass
         new_image[trait] = random.choices(traits[trait], probabilities[trait+'-prob'])[0]
 
     if new_image in all_images:
@@ -124,16 +121,6 @@ def create_new_image():
     else:
         return new_image
 
-"""    new_image["hair"] = random.choices(hair, hair_weights)[0]
-    conditional_trait(new_image["hair"], "black")
-    new_image["glasses"] = random.choices(glasses, glasses_weights)[0]
-    new_image["stash"] = random.choices(stash, stash_weights)[0]
-
-if new_image in all_images:
-    return create_new_image()
-else:
-    return new_image
-"""
 
 # Generate the unique combinations based on trait weightings
 for i in range(TOTAL_IMAGES):
@@ -160,26 +147,36 @@ print(all_images)
 
 # Get Trait Counts
 
-hat_count = {}
-for item in hat:
-    hat_count[item] = 0
 
-back_count = {}
-for item in back:
-    back_count[item] = 0
+# creates a dictionary for each trait and creates nested dictionary for each trait then sets it to 0
+trait_count = {}
+for key, values in traits.items():
+    print('Key :: ', key)
+    trait_count[key] = {}
+    if(isinstance(values, list)):
+        for value in values:
+            trait_count[key][value] = 0
+    else:
+        print(value)
 
-stash_count = {}
-for item in stash:
-    stash_count[item] = 0
 
-for image in all_images:
-    hat_count[image["back"]] += 1
-    stash_count[image["stash"]] += 1
-    back_count[image["hat"]] += 1
+# counts the number of times a trait was used
+for values in all_images:
+    for value in values:
+        spec_value = values[value]
+        if spec_value == 0:
+            break
 
-print("hat", hat_count, )
-print("stash", stash_count)
-print("back", back_count)
+        if value == "tokenId":
+            break
+
+        else:
+            trait_count[value][spec_value] +=1
+    else:
+        print(value)
+
+print(trait_count)
+
 
 #### Generate Metadata for all Traits
 METADATA_FILE_NAME = 'metadata-all-traits.json';
@@ -191,19 +188,38 @@ def image_opener(trait_files, nft_dic):
     size = len(trait_files)
     trait = trait_files[:size - 6]
     varient = (nft_dic[trait])
-    im = f"""/Users/drewlevine/PycharmProjects/layering/shit NFTs/{trait}/{varient}-{trait}.png"""
+    im = f"""/Users/drewlevine/PycharmProjects/layering/shit NFTs/{trait}/{varient}.png"""
+            #/Users/drewlevine/PycharmProjects/layering/shit NFTs/back/main.png
     return im
 
 
 #### Generate Images
+#itirate throught the meta data for each nft
+# item is meta-data for one nft
 for item in all_images:
-    im1 = Image.open((image_opener('hat_files', item)))
-    im2 = Image.open((image_opener('back_files', item)))
-    im3 = Image.open((image_opener('stash_files', item)))
+    """photos_dic = {}
+    # run a for loop to document each trait
+    im_count = 1
+    for trait in traits:
+        #photos_dic[1] = = Image.open((image_opener('hat_files', item)))
+        photos_dic[im_count] = Image.open((image_opener('hat_files', item)))
+        im_count += 1
+        print(photos_dic)"""
+
+    im1 = Image.open((image_opener('back_files', item))).convert("RGBA")
+    im2 = Image.open((image_opener('bandana_files', item))).convert("RGBA")
+    im3 = Image.open((image_opener('body_files', item))).convert("RGBA")
+    im4 = Image.open((image_opener('skin_files', item))).convert("RGBA")
+    im5 = Image.open((image_opener('mouth accessories_files', item))).convert("RGBA")
+    #im6 = Image.open((image_opener('head accessory_files', item))).convert("RGBA")
+
 
     # Create each composite (Alpha composite im2 over im1)
     im1.paste(im2, (0, 0), mask=im2)
     im1.paste(im3, (0, 0), mask=im3)
+    im1.paste(im4, (0, 0), mask=im4)
+    #im1.paste(im5, (0, 0), mask=im5)
+    #im1.paste(im6, (0, 0), mask=im6)
 
     # save images
     file_name = str(item["tokenId"]) + ".png"
@@ -234,8 +250,11 @@ for i in data:
         "attributes": []
     }
     token["attributes"].append(getAttribute("back", i["back"]))
-    token["attributes"].append(getAttribute("hat", i["hat"]))
-    token["attributes"].append(getAttribute("stash", i["stash"]))
+    token["attributes"].append(getAttribute("bandana", i["bandana"]))
+    token["attributes"].append(getAttribute("body", i["body"]))
+    token["attributes"].append(getAttribute("head accessory", i["head accessory"]))
+    token["attributes"].append(getAttribute("mouth accessories", i["mouth accessories"]))
+    token["attributes"].append(getAttribute("skin", i["skin"]))
 
     with open('metadata' + str(token_id), 'w') as outfile:
         json.dump(token, outfile, indent=4)

@@ -58,30 +58,8 @@ num_of_traits = (len(data['traits']))
 traits = data['traits']
 probabilities = data['probs']
 
-print(traits)
-
 # Dictionary variable for each trait.
 # Eech trait corresponds to its file name
-
-"""hat_files = os.listdir('/Users/drewlevine/PycharmProjects/layering/shit NFTs/hat')
-
-print(hat_files)
-back_files = {
-    "black": "black-back",
-    "red": "red-back",
-    "blue": "blue-back",
-    "orange": "orange-back"
-
-}
-
-stash_files = {
-    "black": "black-stash",
-    "red": "red-stash",
-    "blue": "blue-stash",
-}
-
-
-"""
 
 TOTAL_IMAGES = 10  # Number of random unique images we want to generate
 
@@ -115,6 +93,9 @@ def create_new_image():
         except:
             pass
         new_image[trait] = random.choices(traits[trait], probabilities[trait+'-prob'])[0]
+        if new_image[trait] == 0:
+            new_image.pop(trait, None)
+
 
     if new_image in all_images:
         return create_new_image()
@@ -143,7 +124,7 @@ for item in all_images:
     item["tokenId"] = i
     i = i + 1
 
-print(all_images)
+print("list of metadata for each NFT",all_images)
 
 # Get Trait Counts
 
@@ -151,7 +132,6 @@ print(all_images)
 # creates a dictionary for each trait and creates nested dictionary for each trait then sets it to 0
 trait_count = {}
 for key, values in traits.items():
-    print('Key :: ', key)
     trait_count[key] = {}
     if(isinstance(values, list)):
         for value in values:
@@ -175,6 +155,7 @@ for values in all_images:
     else:
         print(value)
 
+#prints how much each trait was used
 print(trait_count)
 
 
@@ -187,39 +168,42 @@ with open(METADATA_FILE_NAME, 'w') as outfile:
 def image_opener(trait_files, nft_dic):
     size = len(trait_files)
     trait = trait_files[:size - 6]
-    varient = (nft_dic[trait])
-    im = f"""/Users/drewlevine/PycharmProjects/layering/shit NFTs/{trait}/{varient}.png"""
-            #/Users/drewlevine/PycharmProjects/layering/shit NFTs/back/main.png
-    return im
+    if trait in nft_dic:
+        varient = (nft_dic[trait])
+        im = f"""/Users/drewlevine/PycharmProjects/layering/shit NFTs/{trait}/{varient}.png"""
+                #/Users/drewlevine/PycharmProjects/layering/shit NFTs/back/main.png
+        return im
+
+    else:
+        return None
 
 
 #### Generate Images
 #itirate throught the meta data for each nft
 # item is meta-data for one nft
 for item in all_images:
-    """photos_dic = {}
-    # run a for loop to document each trait
-    im_count = 1
-    for trait in traits:
-        #photos_dic[1] = = Image.open((image_opener('hat_files', item)))
-        photos_dic[im_count] = Image.open((image_opener('hat_files', item)))
-        im_count += 1
-        print(photos_dic)"""
-
-    im1 = Image.open((image_opener('back_files', item))).convert("RGBA")
-    im2 = Image.open((image_opener('bandana_files', item))).convert("RGBA")
-    im3 = Image.open((image_opener('body_files', item))).convert("RGBA")
-    im4 = Image.open((image_opener('skin_files', item))).convert("RGBA")
-    im5 = Image.open((image_opener('mouth accessories_files', item))).convert("RGBA")
-    #im6 = Image.open((image_opener('head accessory_files', item))).convert("RGBA")
+    if 'back' in item:
+        im1 = Image.open((image_opener('back_files', item))).convert("RGBA")
+    if 'bandana' in item:
+        im2 = Image.open((image_opener('bandana_files', item))).convert("RGBA")
+    if 'body' in item:
+        im3 = Image.open((image_opener('body_files', item))).convert("RGBA")
+    if 'skin' in item:
+        im4 = Image.open((image_opener('skin_files', item))).convert("RGBA")
+    if 'mouth accessories' in item:
+        im5 = Image.open((image_opener('mouth accessories_files', item))).convert("RGBA")
+    if 'head accessory' in item:
+        im6 = Image.open((image_opener('head accessory_files', item))).convert("RGBA")
 
 
     # Create each composite (Alpha composite im2 over im1)
     im1.paste(im2, (0, 0), mask=im2)
     im1.paste(im3, (0, 0), mask=im3)
     im1.paste(im4, (0, 0), mask=im4)
-    #im1.paste(im5, (0, 0), mask=im5)
-    #im1.paste(im6, (0, 0), mask=im6)
+    if 'mouth accessories' in item:
+        im1.paste(im5, (0, 0), mask=im5)
+    if 'head accessory' in item:
+        im1.paste(im6, (0, 0), mask=im6)
 
     # save images
     file_name = str(item["tokenId"]) + ".png"
@@ -252,8 +236,11 @@ for i in data:
     token["attributes"].append(getAttribute("back", i["back"]))
     token["attributes"].append(getAttribute("bandana", i["bandana"]))
     token["attributes"].append(getAttribute("body", i["body"]))
-    token["attributes"].append(getAttribute("head accessory", i["head accessory"]))
-    token["attributes"].append(getAttribute("mouth accessories", i["mouth accessories"]))
+    if 'head accessory' in i:
+        token["attributes"].append(getAttribute("head accessory", i["head accessory"]))
+
+    if 'mouth accessories' in i:
+        token["attributes"].append(getAttribute("mouth accessories", i["mouth accessories"]))
     token["attributes"].append(getAttribute("skin", i["skin"]))
 
     with open('metadata' + str(token_id), 'w') as outfile:

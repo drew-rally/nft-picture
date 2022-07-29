@@ -1,12 +1,8 @@
-from collections import Counter
-from PIL import ImageTk, Image
-import argparse
-import random
 import json
-import csv
+import random
 import pandas as pd
-import os
-#update
+from PIL import Image
+#from comtypes.client import GetActiveObject
 
 
 def json_csv(csvFilePath):
@@ -20,17 +16,16 @@ def json_csv(csvFilePath):
 
     col = 0
     # get columns names
-    while col <= num_columns-1:
+    while col <= num_columns - 1:
         trait_type = (df.columns[col])
-        col +=2
+        col += 2
         traitdic[trait_type] = []
-
 
     for trait in traitdic:
         traitdic[trait] = list(df[trait])
 
     col = 1
-    while col <= num_columns-1:
+    while col <= num_columns - 1:
         prop_type = (df.columns[col])
         col += 2
         probsdic[prop_type] = []
@@ -38,7 +33,7 @@ def json_csv(csvFilePath):
     for prob in probsdic:
         probsdic[prob] = list(df[prob])
 
-    trait_and_probs = {"traits": traitdic,"probs": probsdic}
+    trait_and_probs = {"traits": traitdic, "probs": probsdic}
 
     with open("traits and rarities.json", 'w') as traits_file:
         json.dump(trait_and_probs, traits_file)
@@ -46,8 +41,6 @@ def json_csv(csvFilePath):
 
 
 json_csv("/Users/drewlevine/PycharmProjects/layering/csv/testrly.csv")
-
-
 
 # Each image is made up a series of traits
 # The weightings for each trait drive the rarity and add up to 100%
@@ -79,23 +72,21 @@ def conditional_trait(characters, required_characters, trait_prob, spotInList):
     print(probabilities)
 
 
-
 # to:do add conditional_trait optionality
 def create_new_image():
     new_image = {}
 
     # For each trait category, select a random trait based on the weightings
     for trait in (data['traits']):
-        #how do I check the most recently added trait
+        # how do I check the most recently added trait
         try:
             # checks if the hat trait is red in
-            conditional_trait(new_image['hat'], 'red',"stash-prob", 3)
+            conditional_trait(new_image['hat'], 'red', "stash-prob", 3)
         except:
             pass
-        new_image[trait] = random.choices(traits[trait], probabilities[trait+'-prob'])[0]
+        new_image[trait] = random.choices(traits[trait], probabilities[trait + '-prob'])[0]
         if new_image[trait] == 0:
             new_image.pop(trait, None)
-
 
     if new_image in all_images:
         return create_new_image()
@@ -124,20 +115,15 @@ for item in all_images:
     item["tokenId"] = i
     i = i + 1
 
-print("list of metadata for each NFT",all_images)
+#print("list of metadata for each NFT", all_images)
 
-# Get Trait Counts
-
-
+# trait count how much each trait was used
 # creates a dictionary for each trait and creates nested dictionary for each trait then sets it to 0
 trait_count = {}
 for key, values in traits.items():
     trait_count[key] = {}
-    if(isinstance(values, list)):
-        for value in values:
-            trait_count[key][value] = 0
-    else:
-        print(value)
+    for value in values:
+        trait_count[key][value] = 0
 
 
 # counts the number of times a trait was used
@@ -151,67 +137,61 @@ for values in all_images:
             break
 
         else:
-            trait_count[value][spec_value] +=1
+            trait_count[value][spec_value] += 1
     else:
         print(value)
-
-#prints how much each trait was used
-print(trait_count)
+with open('/Users/drewlevine/PycharmProjects/layering/metadata-count-NFTs.json' , 'w') as outfile:
+    json.dump(trait_count, outfile, indent=4)
 
 
 #### Generate Metadata for all Traits
-METADATA_FILE_NAME = 'metadata-all-traits.json';
+METADATA_FILE_NAME = 'metadata-all-NFTs.json';
 with open(METADATA_FILE_NAME, 'w') as outfile:
     json.dump(all_images, outfile, indent=4)
 
 
 def image_opener(trait_files, nft_dic):
-    size = len(trait_files)
-    trait = trait_files[:size - 6]
-    if trait in nft_dic:
-        varient = (nft_dic[trait])
-        im = f"""/Users/drewlevine/PycharmProjects/layering/shit NFTs/{trait}/{varient}.png"""
-                #/Users/drewlevine/PycharmProjects/layering/shit NFTs/back/main.png
+    if trait_files in nft_dic:
+        varient = (nft_dic[trait_files])
+        im = f"""/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/traits/{trait_files}/{varient}.png"""
+        # /Users/drewlevine/PycharmProjects/layering/PHOF NFTs/traits/back/main.png
         return im
 
     else:
         return None
 
 
-#### Generate Images
-#itirate throught the meta data for each nft
+# this function checks if the inputted trait is in the NFT then calls image_opener() with the correct inputs
+# item is the metadat for one NFT
+# trait is a category of variants i.e. (hats, skins, mouth accessorie)
+def image_assigner(item, trait):
+    if trait in item:
+        im2 = Image.open((image_opener(trait, item))).convert("RGBA")
+        # Create each composite (Alpha composite im2 over im1)
+        im1.paste(im2, (0, 0), mask=im2)
+
+
+# Generate Images
+# iterate through the metadata for each NFT
 # item is meta-data for one nft
 for item in all_images:
     if 'back' in item:
-        im1 = Image.open((image_opener('back_files', item))).convert("RGBA")
-    if 'bandana' in item:
-        im2 = Image.open((image_opener('bandana_files', item))).convert("RGBA")
-    if 'body' in item:
-        im3 = Image.open((image_opener('body_files', item))).convert("RGBA")
-    if 'skin' in item:
-        im4 = Image.open((image_opener('skin_files', item))).convert("RGBA")
-    if 'mouth accessories' in item:
-        im5 = Image.open((image_opener('mouth accessories_files', item))).convert("RGBA")
-    if 'head accessory' in item:
-        im6 = Image.open((image_opener('head accessory_files', item))).convert("RGBA")
-
-
-    # Create each composite (Alpha composite im2 over im1)
-    im1.paste(im2, (0, 0), mask=im2)
-    im1.paste(im3, (0, 0), mask=im3)
-    im1.paste(im4, (0, 0), mask=im4)
-    if 'mouth accessories' in item:
-        im1.paste(im5, (0, 0), mask=im5)
-    if 'head accessory' in item:
-        im1.paste(im6, (0, 0), mask=im6)
-
-    # save images
+        im1 = Image.open((image_opener('back', item))).convert("RGBA")
+    image_assigner(item, "skin")
+    image_assigner(item, "bandana")
+    image_assigner(item, "body")
+    image_assigner(item, "mouth accessories")
+    image_assigner(item, "head accessory")
     file_name = str(item["tokenId"]) + ".png"
-    im1.save("/Users/drewlevine/PycharmProjects/layering/shit NFTs/images/" + file_name)
+    im1.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/images/" + file_name)
+
+    im1 = im1.convert("CMYK")
+    file_name = str(item["tokenId"]) + ".pdf"
+    im1.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/CMYK/" + file_name)
 
 #### Generate Metadata for each Image
 
-f = open('metadata-all-traits.json', )
+f = open('metadata-all-NFTs.json', )
 data = json.load(f)
 
 IMAGES_BASE_URI = "ADD_IMAGES_BASE_URI_HERE"
@@ -225,6 +205,7 @@ def getAttribute(key, value):
     }
 
 
+# reads metadata and creates pictures
 for i in data:
     token_id = i['tokenId']
     token = {
@@ -241,9 +222,31 @@ for i in data:
 
     if 'mouth accessories' in i:
         token["attributes"].append(getAttribute("mouth accessories", i["mouth accessories"]))
-    token["attributes"].append(getAttribute("skin", i["skin"]))
 
-    with open('metadata' + str(token_id), 'w') as outfile:
+    if 'skin' in i:
+        token["attributes"].append(getAttribute("skin", i["skin"]))
+
+    with open('/Users/drewlevine/PycharmProjects/layering/metadata/metadata' + str(token_id), 'w') as outfile:
         json.dump(token, outfile, indent=4)
 f.close()
 
+# Layer the blackoued layers
+
+testim = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/bandana.png")
+testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/blue.png")
+testim.paste(testim1, (0, 0), mask=testim1)
+testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/red.png")
+testim.paste(testim1, (0, 0), mask=testim1)
+testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/regular.png")
+testim.paste(testim1, (0, 0), mask=testim1)
+testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/tech-visor.png")
+testim.paste(testim1, (0, 0), mask=testim1)
+import cv2
+import numpy as np
+testim.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/whitetest.png")
+
+
+
+
+
+#CMYK.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/whitetest.PDF")

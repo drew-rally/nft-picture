@@ -172,6 +172,7 @@ def image_assigner(item, trait):
 
 
 # Generate Images
+# heading in CSV file must be the same name as trait type next to item
 # iterate through the metadata for each NFT
 # item is meta-data for one nft
 for item in all_images:
@@ -182,9 +183,10 @@ for item in all_images:
     image_assigner(item, "body")
     image_assigner(item, "mouth accessories")
     image_assigner(item, "head accessory")
+
     file_name = str(item["tokenId"]) + ".png"
     im1.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/images/" + file_name)
-
+    image_assigner(item, "decorative-boarder")
     im1 = im1.convert("CMYK")
     file_name = str(item["tokenId"]) + ".pdf"
     im1.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/CMYK/" + file_name)
@@ -241,12 +243,4 @@ testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white
 testim.paste(testim1, (0, 0), mask=testim1)
 testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/tech-visor.png")
 testim.paste(testim1, (0, 0), mask=testim1)
-import cv2
-import numpy as np
 testim.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/whitetest.png")
-
-
-
-
-
-#CMYK.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/whitetest.PDF")

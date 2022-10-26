@@ -40,8 +40,13 @@ def json_csv(csvFilePath):
     traits_file.close()
 
 
-json_csv("/Users/drewlevine/PycharmProjects/layering/csv/testrly.csv")
-
+#json_csv("/Users/drewlevine/PycharmProjects/layering/csv/traits for script - ISSAC NEWTON Traits.csv")
+#json_csv("/Users/drewlevine/PycharmProjects/layering/csv/traits for script - Alcapone.csv")
+#json_csv("/Users/drewlevine/PycharmProjects/layering/csv/traits for script - AmeliaEarhart.csv")
+#json_csv("/Users/drewlevine/PycharmProjects/layering/csv/traits for script - Big Brtoher.csv")
+#json_csv("/Users/drewlevine/PycharmProjects/layering/csv/traits for script - Deaton.csv")
+#json_csv("/Users/drewlevine/PycharmProjects/layering/csv/traits for script - RTR.csv")
+json_csv("/Users/drewlevine/PycharmProjects/layering/csv/traits for script - Vangogh.csv")
 # Each image is made up a series of traits
 # The weightings for each trait drive the rarity and add up to 100%
 
@@ -169,6 +174,24 @@ def image_assigner(item, trait):
         im2 = Image.open((image_opener(trait, item))).convert("RGBA")
         # Create each composite (Alpha composite im2 over im1)
         im1.paste(im2, (0, 0), mask=im2)
+        final2 = Image.new("RGBA", im2.size)
+        final2 = Image.alpha_composite(final2, im1)
+        final2 = Image.alpha_composite(final2, im2)
+        im1.paste(final2, (0, 0), mask=final2)
+
+
+def newton_layer():
+    image_assigner(item, "Body")
+    image_assigner(item, "Head")
+    image_assigner(item, "Custom Accessory")
+    image_assigner(item, "Eye Accessory")
+    image_assigner(item, "Mouth Accessory")
+
+
+def crop_image(coordinates, img):
+    cropped_img = img.crop(coordinates)
+
+    return cropped_img
 
 
 # Generate Images
@@ -176,20 +199,31 @@ def image_assigner(item, trait):
 # iterate through the metadata for each NFT
 # item is meta-data for one nft
 for item in all_images:
-    if 'back' in item:
-        im1 = Image.open((image_opener('back', item))).convert("RGBA")
-    image_assigner(item, "skin")
-    image_assigner(item, "bandana")
-    image_assigner(item, "body")
-    image_assigner(item, "mouth accessories")
-    image_assigner(item, "head accessory")
+    #if 'Body' in item:
+    im1 = Image.open((image_opener('back', item))).convert("RGBA")
+    newton_layer()
 
+    im1 = crop_image((176, 176, 1840, 1840), im1)
     file_name = str(item["tokenId"]) + ".png"
     im1.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/images/" + file_name)
-    image_assigner(item, "decorative-boarder")
-    im1 = im1.convert("CMYK")
-    file_name = str(item["tokenId"]) + ".pdf"
-    im1.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/CMYK/" + file_name)
+
+# generates PNG with  frame and no background
+for item in all_images:
+    if 'back' in item:
+        im1 = Image.open((image_opener('back', item))).convert("RGBA")
+    newton_layer()
+
+
+    file_name = str(item["tokenId"]) + ".PNG"
+    im1.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/CMYK no background/" + file_name)
+
+# generates PNG with  frame and background
+for item in all_images:
+    newton_layer()
+
+
+    file_name = str(item["tokenId"]) + ".png"
+    im1.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/CMYK background/" + file_name)
 
 #### Generate Metadata for each Image
 
@@ -217,30 +251,22 @@ for i in data:
         "attributes": []
     }
     token["attributes"].append(getAttribute("back", i["back"]))
-    token["attributes"].append(getAttribute("bandana", i["bandana"]))
-    token["attributes"].append(getAttribute("body", i["body"]))
-    if 'head accessory' in i:
-        token["attributes"].append(getAttribute("head accessory", i["head accessory"]))
+    token["attributes"].append(getAttribute("Body", i["Body"]))
 
-    if 'mouth accessories' in i:
-        token["attributes"].append(getAttribute("mouth accessories", i["mouth accessories"]))
+    #conditonal checks if Custom Accessory exsists in "metadata-all-NFTs"
+    if 'Custom Accessory' in i:
+        token["attributes"].append(getAttribute("Custom Accessory", i["Custom Accessory"]))
 
-    if 'skin' in i:
-        token["attributes"].append(getAttribute("skin", i["skin"]))
+    if 'Eye Accessory' in i:
+        token["attributes"].append(getAttribute("Eye Accessory", i["Eye Accessory"]))
+
+    if 'Head' in i:
+        token["attributes"].append(getAttribute("Head", i["Head"]))
+
+    if 'Mouth Accessory' in i:
+        token["attributes"].append(getAttribute("Mouth Accessory", i["Mouth Accessory"]))
 
     with open('/Users/drewlevine/PycharmProjects/layering/metadata/metadata' + str(token_id), 'w') as outfile:
         json.dump(token, outfile, indent=4)
 f.close()
 
-# Layer the blackoued layers
-
-testim = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/bandana.png")
-testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/blue.png")
-testim.paste(testim1, (0, 0), mask=testim1)
-testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/red.png")
-testim.paste(testim1, (0, 0), mask=testim1)
-testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/regular.png")
-testim.paste(testim1, (0, 0), mask=testim1)
-testim1 = Image.open("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/tech-visor.png")
-testim.paste(testim1, (0, 0), mask=testim1)
-testim.save("/Users/drewlevine/PycharmProjects/layering/PHOF NFTs/white CMYK/CMYK-test/whitetest.png")
